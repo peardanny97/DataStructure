@@ -6,7 +6,6 @@
 #include <tuple>
 #include <queue>
 #include <algorithm>
-
 /* Feel free to add more standard library headers */
 
 #include "graph.hpp"
@@ -23,8 +22,8 @@ std::unordered_map<vertex_t, std::optional<std::tuple<vertex_t, edge_weight_t>>>
 dijkstra_shortest_path(Graph& g, vertex_t src) {
     bool d_visited_list[g.num_vertices];
     std::priority_queue<edge_t,edges_t,compare> pq;
-    std::unordered_map<vertex_t,std::optional
-    <std::tuple<vertex_t,edge_weight_t>>> d_path;
+    std::unordered_map<vertex_t,std::optional<std::tuple<vertex_t,edge_weight_t>>> result;
+    std::tuple<vertex_t,edge_weight_t> d_path[g.num_vertices];
     for(auto i=0; i<g.num_vertices; i++){
         d_visited_list[i] = false;
     }
@@ -36,6 +35,7 @@ dijkstra_shortest_path(Graph& g, vertex_t src) {
         w = g.adj_list[src][i].second; // weight
         pq.push({s,d,w});
     }
+    
     d_path[src] = {src,0.0f};
     while(!pq.empty()){
         edge_t cur = pq.top();
@@ -49,7 +49,8 @@ dijkstra_shortest_path(Graph& g, vertex_t src) {
         edge_weight_t w = std::get<2>(cur);
         d_visited_list[s] = true;
         d_visited_list[d] = true;
-        d_path[d] = {s, std::get<2>(cur)};
+        //std::make_pair<vertex_t,std::optional<std::tuple<vertex_t,edge_weight_t>>>(d,std::tuple<vertex_t,edge_weight_t>)
+        d_path[d] = {s, w};
         for(auto i=0; i<g.adj_list[d].size();i++){
             // Let's make pq for next vertex
             vertex_t next_s, next_d;
@@ -63,10 +64,11 @@ dijkstra_shortest_path(Graph& g, vertex_t src) {
     }
     for(auto i=0; i<g.num_vertices; i++){
         if(!d_visited_list[i]){
-            return {};
+            result.insert(std::make_pair<vertex_t,std::optional<std::tuple<vertex_t,edge_weight_t>>>(i,std::nullopt));
         }
+        else result.insert(std::make_pair<vertex_t,std::optional<std::tuple<vertex_t,edge_weight_t>>>(i,std::tuple<vertex_t,edge_weight_t>(std::get<0>(d_path[i]),std::get<1>(d_path[i]))));
     }
-    return d_path;
+    return result;
 }
 
 #endif // __DIJKSTRA_SHORTEST_PATHS_H_

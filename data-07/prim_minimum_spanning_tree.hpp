@@ -51,7 +51,7 @@ std::optional<edges_t> prim_minimum_spanning_tree(Graph& g, vertex_t src) {
     }
     for(auto i=0; i<g.num_vertices; i++){
         if(!p_visited_list[i]){
-            return {};
+            return std::nullopt;
         }
     }
     return mst;
